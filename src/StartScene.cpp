@@ -59,27 +59,6 @@ void StartScene::start()
 	m_pShip->getTransform()->position = glm::vec2(400.0f, 300.0f); 
 	addChild(m_pShip); 
 
-	// Start Button
-	/*m_pStartButton = new Button();
-	m_pStartButton->getTransform()->position = glm::vec2(400.0f, 400.0f); 
-
-	m_pStartButton->addEventListener(CLICK, [&]()-> void
-	{
-		m_pStartButton->setActive(false);
-		TheGame::Instance()->changeSceneState(PLAY_SCENE);
-	});
-	
-	m_pStartButton->addEventListener(MOUSE_OVER, [&]()->void
-	{
-		m_pStartButton->setAlpha(128);
-	});
-
-	m_pStartButton->addEventListener(MOUSE_OUT, [&]()->void
-	{
-		m_pStartButton->setAlpha(255);
-	});
-	addChild(m_pStartButton);*/
-
 	m_pTeamMember= new Label("Xin, Lyu 101240247", "Consolas", 20, blue, glm::vec2(400.0f, 160.0f));
 	m_pTeamMember->setParent(this);
 	addChild(m_pTeamMember);
