@@ -60,7 +60,7 @@ void StartScene::start()
 	addChild(m_pShip); 
 
 	// Start Button
-	m_pStartButton = new Button();
+	/*m_pStartButton = new Button();
 	m_pStartButton->getTransform()->position = glm::vec2(400.0f, 400.0f); 
 
 	m_pStartButton->addEventListener(CLICK, [&]()-> void
@@ -78,8 +78,51 @@ void StartScene::start()
 	{
 		m_pStartButton->setAlpha(255);
 	});
-	addChild(m_pStartButton);
+	addChild(m_pStartButton);*/
 
-	
+	m_pTeamMember= new Label("Xin, Lyu 101240247", "Consolas", 20, blue, glm::vec2(400.0f, 160.0f));
+	m_pTeamMember->setParent(this);
+	addChild(m_pTeamMember);
+
+	// Start Button
+	m_pScene1Button = new Button("../Assets/textures/scene1Button.png", "scene1Button", SCENE1_BUTTON);
+	m_pScene1Button->getTransform()->position = glm::vec2(400.0f, 400.0f);
+
+	m_pScene1Button->addEventListener(CLICK, [&]()-> void
+		{
+			m_pScene1Button->setActive(false);
+			TheGame::Instance()->changeSceneState(PLAY_SCENE);
+		});
+
+	m_pScene1Button->addEventListener(MOUSE_OVER, [&]()->void
+		{
+			m_pScene1Button->setAlpha(128);
+		});
+
+	m_pScene1Button->addEventListener(MOUSE_OUT, [&]()->void
+		{
+			m_pScene1Button->setAlpha(255);
+		});
+	addChild(m_pScene1Button);
+
+	m_pScene2Button = new Button("../Assets/textures/scene2Button.png", "scene2Button", SCENE2_BUTTON);
+	m_pScene2Button->getTransform()->position = glm::vec2(400.0f, 500.0f);
+
+	m_pScene2Button->addEventListener(CLICK, [&]()-> void
+		{
+			m_pScene2Button->setActive(false);
+			TheGame::Instance()->changeSceneState(SCENE2);
+		});
+
+	m_pScene2Button->addEventListener(MOUSE_OVER, [&]()->void
+		{
+			m_pScene2Button->setAlpha(128);
+		});
+
+	m_pScene2Button->addEventListener(MOUSE_OUT, [&]()->void
+		{
+			m_pScene2Button->setAlpha(255);
+		});
+	addChild(m_pScene2Button);
 }
 

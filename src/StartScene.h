@@ -26,7 +26,10 @@ private:
 
 	Ship* m_pShip{};
 
-	Button* m_pStartButton;
+	Button* m_pScene1Button;
+	Button* m_pScene2Button;
+
+	Label* m_pTeamMember{};
 };
 
 #endif /* defined (__START_SCENE__) */
