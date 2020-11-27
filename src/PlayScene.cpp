@@ -29,6 +29,18 @@ void PlayScene::draw()
 void PlayScene::update()
 {
 	updateDisplayList();
+
+	if (SDL_GetTicks() - bulletSpawnTimerStart >= bulletSpawnTimerDuration) {
+		SpawnBullet();
+	}
+	std::vector<Bullet*>& activeBullets = m_pPool->all;
+	for (std::vector<Bullet*>::iterator myiter = activeBullets.begin(); myiter != activeBullets.end(); myiter++) {
+		Bullet* bullet = *myiter;
+		if (bullet->active && bullet->getTransform()->position.y >= 650) {
+			m_pPool->Despawn(bullet);
+			break;
+		}
+	}
 }
 
 void PlayScene::clean()
@@ -174,8 +186,21 @@ void PlayScene::start()
 	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 500.0f);
 
 	addChild(m_pInstructionsLabel);
-}
 
+	m_pPool = new BulletPool(10);
+	for (std::vector<Bullet*>::iterator myiter = m_pPool->all.begin(); myiter != m_pPool->all.end(); myiter++) {
+		Bullet* bullet = *myiter;
+		addChild(bullet);
+	}
+	bulletSpawnTimerStart = SDL_GetTicks();
+}
+void PlayScene::SpawnBullet() {
+	Bullet* bullet = m_pPool->Spawn();
+	if (bullet) {
+		bullet->getTransform()->position = glm::vec2(50 + rand() % 700, 0);
+	}
+	bulletSpawnTimerStart = SDL_GetTicks();
+}
 void PlayScene::GUI_Function() const
 {
 	// Always open with a NewFrame

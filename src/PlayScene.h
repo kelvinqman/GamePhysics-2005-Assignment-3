@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Button.h"
 #include "Label.h"
+#include "BulletPool.h"
 
 class PlayScene : public Scene
 {
@@ -35,6 +36,11 @@ private:
 	Button* m_pBackButton;
 	Button* m_pNextButton;
 	Label* m_pInstructionsLabel;
+
+	const float bulletSpawnTimerDuration = 500.0f;
+	float bulletSpawnTimerStart;
+	BulletPool* m_pPool;
+	void SpawnBullet();
 };
 
 #endif /* defined (__PLAY_SCENE__) */
