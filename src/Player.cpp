@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "TextureManager.h"
+#include "SoundManager.h"
 
 Player::Player(): m_currentAnimationState(PLAYER_IDLE_RIGHT)
 {
@@ -23,6 +24,8 @@ Player::Player(): m_currentAnimationState(PLAYER_IDLE_RIGHT)
 	setType(PLAYER);
 
 	m_buildAnimations();
+
+	SoundManager::Instance().load("../Assets/audio/Explode.wav", "explode", SoundType::SOUND_SFX);
 }
 
 Player::~Player()

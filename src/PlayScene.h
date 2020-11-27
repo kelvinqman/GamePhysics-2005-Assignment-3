@@ -41,6 +41,8 @@ private:
 	float bulletSpawnTimerStart;
 	BulletPool* m_pPool;
 	void SpawnBullet();
+
+	void checkCollision();
 };
 
 #endif /* defined (__PLAY_SCENE__) */

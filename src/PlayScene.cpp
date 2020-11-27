@@ -41,6 +41,7 @@ void PlayScene::update()
 			break;
 		}
 	}
+	checkCollision();
 }
 
 void PlayScene::clean()
@@ -202,6 +203,22 @@ void PlayScene::SpawnBullet() {
 		bullet->getTransform()->position = glm::vec2(50 + rand() % 700, 0);
 	}
 	bulletSpawnTimerStart = SDL_GetTicks();
+}
+void PlayScene::checkCollision()
+{
+	SDL_Rect playerRect = { m_pPlayer->getTransform()->position.x,m_pPlayer->getTransform()->position.y,m_pPlayer->getWidth(),m_pPlayer->getHeight() };
+	std::vector<Bullet*>& activeBullets = m_pPool->all;
+	for (std::vector<Bullet*>::iterator myiter = activeBullets.begin(); myiter != activeBullets.end(); myiter++) {
+		Bullet* bullet = *myiter;
+		if (bullet->active && !bullet->getRigidBody()->isColliding) {
+			SDL_Rect bulletRect = { bullet->getTransform()->position.x,bullet->getTransform()->position.y,bullet->getWidth(),bullet->getHeight() };
+			if (SDL_HasIntersection(&playerRect, &bulletRect)) {
+				std::cout << "hit" << std::endl;
+				SoundManager::Instance().playSound("explode", 0, -1);
+				bullet->getRigidBody()->isColliding = true;
+			}
+		}
+	}
 }
 void PlayScene::GUI_Function() const
 {
