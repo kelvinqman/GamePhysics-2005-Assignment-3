@@ -19,6 +19,9 @@ public:
 	// setters
 	void setAnimationState(PlayerAnimationState new_state);
 
+	void moveLeft();
+	void moveRight();
+
 private:
 	void m_buildAnimations();
 
