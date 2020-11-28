@@ -7,7 +7,8 @@
 #include "Player.h"
 #include "Button.h"
 #include "Label.h"
-
+#include "BouncingBall.h"
+#include "Brick.h"
 class Scene2 : public Scene
 {
 public:
@@ -28,13 +29,16 @@ private:
 	glm::vec2 m_mousePosition;
 
 	Plane* m_pPlaneSprite;
-	Player* m_pPlayer;
+	//Player* m_pPlayer;
 	bool m_playerFacingRight;
 
 	// UI Items
 	Button* m_pBackButton;
 	Button* m_pNextButton;
 	Label* m_pInstructionsLabel;
+
+	BouncingBall* m_pBall;
+	Brick* m_pBrick;
 };
 
 #endif /* defined (__PLAY_SCENE__) */

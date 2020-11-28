@@ -14,6 +14,8 @@ enum GameObjectType {
 	SCENE1_BUTTON,
 	SCENE2_BUTTON,
 	ENEMY,
+	BOUNCINGBALL,
+	BRICK,
 	NUM_OF_TYPES
 };
 #endif /* defined (__GAME_OBJECT_TYPE__) */
