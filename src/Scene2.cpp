@@ -77,7 +77,7 @@ void Scene2::start()
 
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
-	m_pBackButton->getTransform()->position = glm::vec2(300.0f, 400.0f);
+	m_pBackButton->getTransform()->position = glm::vec2( 550.0f, 20.0f);
 	m_pBackButton->addEventListener(CLICK, [&]()-> void
 		{
 			m_pBackButton->setActive(false);
@@ -97,7 +97,7 @@ void Scene2::start()
 
 	// Next Button
 	m_pNextButton = new Button("../Assets/textures/nextButton.png", "nextButton", NEXT_BUTTON);
-	m_pNextButton->getTransform()->position = glm::vec2(500.0f, 400.0f);
+	m_pNextButton->getTransform()->position = glm::vec2(720.0f, 20.0f);
 	m_pNextButton->addEventListener(CLICK, [&]()-> void
 		{
 			m_pNextButton->setActive(false);
@@ -157,14 +157,19 @@ void Scene2::GUI_Function() const
 
 	ImGui::Separator();
 
-	static float float3[3] = { 0.0f, 1.0f, 1.5f };
-	if (ImGui::SliderFloat3("My Slider", float3, 0.0f, 2.0f))
-	{
-		std::cout << float3[0] << std::endl;
-		std::cout << float3[1] << std::endl;
-		std::cout << float3[2] << std::endl;
-		std::cout << "---------------------------\n";
-	}
+	
+	std::string str1 = " X: " + std::to_string(m_pBall->getTransform()->position.x)
+		+ " Y: " + std::to_string(m_pBall->getTransform()->position.y);
+	const char* cstr1 = str1.c_str();
+	ImGui::LabelText("Position", cstr1);
+	std::string str2 = " X: " + std::to_string(m_pBall->getRigidBody()->velocity.x)
+		+ " Y: " + std::to_string(m_pBall->getRigidBody()->velocity.y);
+	const char* cstr2 = str2.c_str();
+	ImGui::LabelText("Velocity", cstr2);
+	std::string str3 = " X: " + std::to_string(m_pBall->getRigidBody()->acceleration.x)
+		+ " Y: " + std::to_string(m_pBall->getRigidBody()->acceleration.y);
+	const char* cstr3 = str3.c_str();
+	ImGui::LabelText("Acceleration", cstr3);
 
 	ImGui::End();
 
