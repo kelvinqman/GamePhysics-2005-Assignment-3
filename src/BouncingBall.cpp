@@ -40,6 +40,26 @@ void BouncingBall::clean()
 {
 }
 
+bool BouncingBall::boundary()
+{
+	return (getTransform()->position.x >= 800 - getWidth() / 2 || getTransform()->position.x <= 0 + getWidth() / 2) ||
+		(getTransform()->position.y >= 600 - getHeight() / 2 || getTransform()->position.y <= 0 + getHeight() / 2);
+}
+
+void BouncingBall::bounceX()
+{
+	getRigidBody()->velocity.x *= -1;
+	getRigidBody()->acceleration.x *= -1;
+	bouncedX = true;
+}
+
+void BouncingBall::bounceY()
+{
+	getRigidBody()->velocity.y *= -1;
+	getRigidBody()->acceleration.y *= -1;
+	bouncedY = true;
+}
+
 void BouncingBall::move()
 {
 	float deltaTime = 1.0f / 60.0f;
@@ -84,12 +104,8 @@ void BouncingBall::slowDown()
 	float x = getRigidBody()->velocity.x;
 	float y = getRigidBody()->velocity.y;
 	glm::vec2 m_direction = glm::vec2(x, y);
-	float dirMagnitude = Util::magnitude(m_direction);
 	float ACCELERATION = 2;
-	/*if (dirMagnitude > 0) {
-		getRigidBody()->acceleration = Util::normalize(m_direction) * -ACCELERATION;
-	}
-	else */if (Util::magnitude(getRigidBody()->velocity) > ACCELERATION) {
+	if (Util::magnitude(getRigidBody()->velocity) > ACCELERATION) {
 		getRigidBody()->acceleration = Util::normalize(getRigidBody()->velocity) * -ACCELERATION;
 	}
 	else

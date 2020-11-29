@@ -39,6 +39,22 @@ private:
 
 	BouncingBall* m_pBall;
 	Brick* m_pBrick;
+
+	bool hoverOver();
+	bool mouseButtonDown;
+	void dragDrop();
+	bool hoverOvered;
+
+	void checkBrick();
+	bool bouncedX, bouncedY;
+	void reset();
+	bool hit;
+
+	float timeStart=0,timeEnd=0;
+	glm::vec2 tempPos;
+	glm::vec2 endPos;
+	const float timerDuration=50.0f;
+	bool draged = false;
 };
 
 #endif /* defined (__PLAY_SCENE__) */

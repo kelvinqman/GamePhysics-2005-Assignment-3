@@ -25,11 +25,15 @@ void Scene2::draw()
 
 	drawDisplayList();
 	SDL_SetRenderDrawColor(Renderer::Instance()->getRenderer(), 255, 255, 255, 255);
+
 }
 
 void Scene2::update()
 {
 	updateDisplayList();
+	dragDrop();
+	checkBrick();
+	reset();
 }
 
 void Scene2::clean()
@@ -40,64 +44,6 @@ void Scene2::clean()
 void Scene2::handleEvents()
 {
 	EventManager::Instance().update();
-
-	// handle player movement with GameController
-	//if (SDL_NumJoysticks() > 0)
-	//{
-	//	if (EventManager::Instance().getGameController(0) != nullptr)
-	//	{
-	//		const auto deadZone = 10000;
-	//		if (EventManager::Instance().getGameController(0)->LEFT_STICK_X > deadZone)
-	//		{
-	//			m_pPlayer->setAnimationState(PLAYER_RUN_RIGHT);
-	//			m_playerFacingRight = true;
-	//		}
-	//		else if (EventManager::Instance().getGameController(0)->LEFT_STICK_X < -deadZone)
-	//		{
-	//			m_pPlayer->setAnimationState(PLAYER_RUN_LEFT);
-	//			m_playerFacingRight = false;
-	//		}
-	//		else
-	//		{
-	//			if (m_playerFacingRight)
-	//			{
-	//				m_pPlayer->setAnimationState(PLAYER_IDLE_RIGHT);
-	//			}
-	//			else
-	//			{
-	//				m_pPlayer->setAnimationState(PLAYER_IDLE_LEFT);
-	//			}
-	//		}
-	//	}
-	//}
-
-
-	//// handle player movement if no Game Controllers found
-	//if (SDL_NumJoysticks() < 1)
-	//{
-	//	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_A))
-	//	{
-	//		m_pPlayer->setAnimationState(PLAYER_RUN_LEFT);
-	//		m_playerFacingRight = false;
-	//	}
-	//	else if (EventManager::Instance().isKeyDown(SDL_SCANCODE_D))
-	//	{
-	//		m_pPlayer->setAnimationState(PLAYER_RUN_RIGHT);
-	//		m_playerFacingRight = true;
-	//	}
-	//	else
-	//	{
-	//		if (m_playerFacingRight)
-	//		{
-	//			m_pPlayer->setAnimationState(PLAYER_IDLE_RIGHT);
-	//		}
-	//		else
-	//		{
-	//			m_pPlayer->setAnimationState(PLAYER_IDLE_LEFT);
-	//		}
-	//	}
-	//}
-
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_ESCAPE))
 	{
@@ -113,21 +59,21 @@ void Scene2::handleEvents()
 	{
 		TheGame::Instance()->changeSceneState(END_SCENE);
 	}
+
+	m_mousePosition= EventManager::Instance().getMousePosition();
+	mouseButtonDown = EventManager::Instance().getMouseButton(0);
+	if (mouseButtonDown && hoverOver()&&!draged) {
+		timeStart = SDL_GetTicks();
+		tempPos = m_pBrick->getTransform()->position;
+		std::cout << timeStart<<"  " << std::endl;
+		draged = true;
+	}
 }
 
 void Scene2::start()
 {
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
-
-	// Plane Sprite
-	//m_pPlaneSprite = new Plane();
-	//addChild(m_pPlaneSprite);
-
-	//// Player Sprite
-	//m_pPlayer = new Player();
-	//addChild(m_pPlayer);
-	//m_playerFacingRight = true;
 
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "backButton", BACK_BUTTON);
@@ -181,6 +127,17 @@ void Scene2::start()
 
 	m_pBrick = new Brick();
 	addChild(m_pBrick);
+
+	hoverOvered = false;
+
+	bouncedX = false;
+	bouncedY = false;
+
+	hit = false;
+
+	//timeStart = 0;
+	tempPos = glm::vec2(0, 0);
+	endPos= glm::vec2(0, 0);
 }
 
 void Scene2::GUI_Function() const
@@ -216,3 +173,92 @@ void Scene2::GUI_Function() const
 	ImGuiSDL::Render(ImGui::GetDrawData());
 	ImGui::StyleColorsDark();
 }
+
+bool Scene2::hoverOver()
+{
+	return m_mousePosition.x < (m_pBrick->getTransform()->position.x + m_pBrick->getWidth() / 2) && m_mousePosition.x >(m_pBrick->getTransform()->position.x - m_pBrick->getWidth() / 2) &&
+		m_mousePosition.y < (m_pBrick->getTransform()->position.y + m_pBrick->getHeight() / 2) && m_mousePosition.y >(m_pBrick->getTransform()->position.y - m_pBrick->getHeight() / 2);
+}
+
+void Scene2::dragDrop()
+{
+	if (hoverOver())
+		hoverOvered = true;
+	if (hoverOvered && mouseButtonDown && !hit) {
+		m_pBrick->getTransform()->position = glm::vec2(m_mousePosition.x, m_mousePosition.y);
+		if (SDL_GetTicks() - timeStart >= timerDuration) {
+			draged = false;
+			std::cout << "updated" << std::endl;
+		}
+	}
+	if (!mouseButtonDown && hoverOvered)
+		hoverOvered = false;
+	if (!mouseButtonDown && hit)
+		hit = false;
+}
+
+void Scene2::checkBrick()
+{
+	SDL_Rect brickRect = { m_pBrick->getTransform()->position.x,m_pBrick->getTransform()->position.y,m_pBrick->getWidth(),m_pBrick->getHeight() };
+	SDL_Rect ballRect = { m_pBall->getTransform()->position.x,m_pBall->getTransform()->position.y,m_pBall->getWidth(),m_pBall->getHeight() };
+
+	if (!m_pBall->getRigidBody()->isColliding&& SDL_HasIntersection(&brickRect, &ballRect)) {
+		std::cout << "hit" << std::endl;
+		timeEnd = SDL_GetTicks();
+		endPos = m_pBrick->getTransform()->position;
+		if (mouseButtonDown/* && hoverOvered*/) {
+			m_pBrick->getRigidBody()->velocity.x = (endPos.x - tempPos.x) / (timeEnd - timeStart) * 1000;
+			m_pBrick->getRigidBody()->velocity.y = (endPos.y - tempPos.y) / (timeEnd - timeStart) * 1000;
+		}
+		else m_pBrick->getRigidBody()->velocity = glm::vec2(0, 0);
+		std::cout << timeEnd - timeStart << "  " << m_pBrick->getRigidBody()->velocity.x << "  " << m_pBrick->getRigidBody()->velocity.y << std::endl;
+		hit = true;
+		m_pBall->getRigidBody()->isColliding = true;
+		bool top = m_pBall->getTransform()->position.y < m_pBrick->getTransform()->position.y;
+		bool bottom = m_pBall->getTransform()->position.y > m_pBrick->getTransform()->position.y;
+		bool left = m_pBall->getTransform()->position.x < m_pBrick->getTransform()->position.x;
+		bool right = m_pBall->getTransform()->position.x > m_pBrick->getTransform()->position.x;
+		float x = abs(m_pBall->getTransform()->position.x - m_pBrick->getTransform()->position.x);
+		float y = abs(m_pBall->getTransform()->position.y - m_pBrick->getTransform()->position.y);
+		bool samedirectionX = m_pBrick->getRigidBody()->velocity.x / m_pBall->getRigidBody()->velocity.x>0;
+		bool samedirectionY = m_pBrick->getRigidBody()->velocity.y / m_pBall->getRigidBody()->velocity.y > 0;
+		if (!samedirectionX&&!samedirectionY) {
+			if (top) {
+				if (left) {
+					if (x < y) m_pBall->bounceY();
+					else m_pBall->bounceX();
+				}
+				if (right) {
+					if (x < y) m_pBall->bounceY();
+					else m_pBall->bounceX();
+				}
+			}
+			if (bottom) {
+				if (left) {
+					if (x < y) m_pBall->bounceY();
+					else m_pBall->bounceX();
+				}
+				if (right) {
+					if (x < y) m_pBall->bounceY();
+					else m_pBall->bounceX();
+				}
+			}
+			if (m_pBall->getBouncedX()) {
+				m_pBall->getRigidBody()->velocity.x += m_pBrick->getRigidBody()->velocity.x;
+			}
+			if (m_pBall->getBouncedY()) {
+				m_pBall->getRigidBody()->velocity.y += m_pBrick->getRigidBody()->velocity.y;
+			}
+		}
+	}
+}
+
+void Scene2::reset()
+{
+	SDL_Rect brickRect = { m_pBrick->getTransform()->position.x,m_pBrick->getTransform()->position.y,m_pBrick->getWidth(),m_pBrick->getHeight() };
+	SDL_Rect ballRect = { m_pBall->getTransform()->position.x,m_pBall->getTransform()->position.y,m_pBall->getWidth(),m_pBall->getHeight() };
+
+	if (m_pBall->getRigidBody()->isColliding && !SDL_HasIntersection(&brickRect, &ballRect))
+		m_pBall->getRigidBody()->isColliding = false;
+}
+
